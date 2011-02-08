@@ -1,1 +1,9 @@
-This project objective is to create a lap timer register based only on gps coordinates received by a specific gps module, the Telit GE-863. 
+The project goal is to create a lap timer register based on gps coordinates received by a specific gps module, the Telit GE-863.
+
+WARNING: 
+
+1) The Python syntax used in this project came from the standarts used in Python1.5.2 version, whitch is the interpreter version used on Telit GE-863 Module
+
+2) Is highly recomended to compile this files into python object files. Is faster to execute on the module.
+
+3) The module only accepts Python 1.5.2 object files, so you have to download the source code from http://www.python.org, search for old releases (This version is more than 10 years old ), and compile it for you machine using gcc(It is common to have some inconsistences in the compilation proccess).
