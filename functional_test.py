@@ -37,6 +37,10 @@ class TestFunctional (unittest.TestCase):
         
         self.assertFalse(main.is_valid_message(spl_message))
         
+    def test_should_return_a_formated_message_when_gps_message_is_valid(self):
+        gps_data = main.get_formated_gps_data()
+        self.assertEqual(gps_data[0:10], '225109.000')
+        
         
     # def test_should_get_formated_gps_data(self):
     #     string_to_write = "Testing"
