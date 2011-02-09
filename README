@@ -7,3 +7,23 @@ WARNING:
 2) Is highly recomended to compile this files into python object files. Is faster to execute on the module.
 
 3) The module only accepts Python 1.5.2 object files, so you have to download the source code from http://www.python.org, search for old releases (This version is more than 10 years old ), and compile it for you machine using gcc(It is common to have some inconsistences in the compilation proccess).
+
+
+TESTS:
+
+We are using the python unittest with mockito to write all the tests for this application. To test the program on your computer, just run:
+
+$ python all_tests.py
+
+COMPILE:
+
+To compile this project you have to use the python version 1.5.2 interpreter. So if you build it under the name "python1.5.2" on your system, type on terminal:
+
+$ python1.5.2 make.py source_file.py dest_file.pyo
+
+where:
+make.py is a script to build a .py file into a bytecode file that can be read by the module.
+
+source_file.py - the file that you want to compile.
+
+dest_file.pyo - the name of the final compiled file. 
