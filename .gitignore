@@ -1,0 +1,6 @@
+# Compiled source #
+###################
+*.o
+*.so
+*.pyo
+*.pyc
