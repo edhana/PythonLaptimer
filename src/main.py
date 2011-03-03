@@ -46,10 +46,18 @@ def get_formated_gps_data():
     
     return_message = ""
     
-    if gps_split_message != None and gps_split_message != "" and is_valid_message(gps_split_message):
-        return_message = "%s,%s,%s,%s,%s,%s,%s"%(gps_split_message[0], gps_split_message[1], gps_split_message[2], 
-            gps_split_message[4], gps_split_message[5],gps_split_message[6], gps_split_message[7])
+    # 0 - tempo
+    # 1 - latitude
+    # 2 - Longitude
+    # 4 - Altitude
+    # 5 - Fix
+    # 6 - Angulo 
+    # 7 - Velocidade
     
+    if gps_split_message != None and gps_split_message != "" and is_valid_message(gps_split_message):
+        # return_message = "%s,%s,%s,%s,%s,%s,%s"%(gps_split_message[0], gps_split_message[1], gps_split_message[2], 
+        return_message = "%s,%s,%s,%s,%s,%s"%(gps_split_message[0], gps_split_message[1], gps_split_message[2], gps_split_message[5],gps_split_message[6], gps_split_message[7])
+        
     return  return_message
     
 def get_speed(gps_data):
@@ -97,6 +105,8 @@ if __name__ == "__main__":
         
         while(1):
             loop(gps_log_file)
+            # enxerta uma pausa para deixar o flush rolar
+            MOD.sleep(4) # Pausa por 4 decimos de segundo
             
     except Exception, err2:
         SER.send("Erro na escrita do arquivo de log: %s\n"%err2)
