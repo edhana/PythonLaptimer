@@ -49,7 +49,6 @@ def get_formated_gps_data():
     # 0 - tempo
     # 1 - latitude
     # 2 - Longitude
-    # 4 - Altitude
     # 5 - Fix
     # 6 - Angulo 
     # 7 - Velocidade
