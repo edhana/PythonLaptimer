@@ -4,9 +4,10 @@ import MOD
 
 import command
 
-SPEED_LOWER_LIMIT=5 # Minimum speed limit to save gps data
+SPEED_LOWER_LIMIT= 10 # Minimum speed limit to save gps data
 GPS_LOG_FILE_NAME="input.log"
 gps_split_message = []
+WATCHDOG_TIMEOUT = 60
     
 def is_valid_message(gps_split_message):
     # verify the fixmode at the 6th element of array TODO: Verify the speed to
@@ -56,9 +57,10 @@ def loop(gps_log_file):
     gps_data = get_formated_gps_data()
     
     if gps_log_file != None and gps_data != None and gps_data != "":
-        if get_speed(gps_data) > 10: # write only if speed is greater than 10 km/h
+        if get_speed(gps_data) > SPEED_LOWER_LIMIT: # write only if speed is greater than 10 km/h
             gps_log_file.write("%s\n"%gps_data)
             gps_log_file.flush()
+            MOD.watchdogReset()
         else:
             # close the log file
             gps_log_file.flush()
@@ -73,7 +75,7 @@ def init():
         command.send_at_command("AT&K0")
         
         # Configure GPS speed
-        command.send_at_command("AT$GPSS=57600")
+        # command.send_at_command("AT$GPSS=57600")
         
     except Exception, err:
         SER.send("Erro ao iniciar o modulo: %s\n"%err)
@@ -84,8 +86,8 @@ def get_new_log_filename():
 
     gps_split_message = gps_string.split(',')
 
-    if is_valid_message(gps_split_message):
-        return "laptimer%s.log"%gps_split_message[0].split('.')[0]
+    if is_valid_message(gps_split_message) and int(gps_split_message[7].split('.')[0]) > SPEED_LOWER_LIMIT :
+        return "%s.log"%gps_split_message[0].split('.')[0]
 
     return ''        
     
@@ -94,7 +96,7 @@ if __name__ == "__main__":
     SER.send("Iniciando cliente Lap Timer em %d\n"%MOD.secCounter())
     
     # Watchdog set to 20 seconds
-    MOD.watchdogEnable(20) 
+    MOD.watchdogEnable(WATCHDOG_TIMEOUT) 
     
     # Open the log file
     gps_log_file = None
@@ -107,24 +109,30 @@ if __name__ == "__main__":
         log_filename = get_new_log_filename()
         if log_filename == '':
             SER.send("Nome de arquivo de log nao criado.\n")
-            MOD.sleep(10)
-        else:
-            SER.send("Nome do novo arquivo: %s"%log_filename)
+            MOD.sleep(40)
+        else:            
             MOD.watchdogReset()
+            
+    # Configure the GPS Serial speed
+    command.send_at_command("AT$GPSS=57600")
         
     try:    
-        gps_log_file = open(GPS_LOG_FILE_NAME, 'w')    
+        # TODO: O Erro esta aqui nao cria arquivos com nome editado em runtime
+        SER.send("Novo log: %s\n"%log_filename)
+        gps_log_file = open("%s"%log_filename, 'w')    
+        # gps_log_file = open(log_filename, 'w')    
+        gps_log_file.write("Nova sessao: %d"%MOD.secCounter())
+        gps_log_file.flush()
     except Exception, err:
         SER.send("Nao foi possivel abrir o arquivo de log: %s\n"%err)
     
     if gps_log_file != None:
-        
         try: 
             start_time = MOD.secCounter()
         
             while(1):
                 loop(gps_log_file)
-                MOD.watchdogReset()
+                # MOD.watchdogReset()
                 
                 # Sleep to let the file flush work
                 MOD.sleep(2)
@@ -136,3 +144,4 @@ if __name__ == "__main__":
         gps_log_file.close()
     
     SER.send("FIM\n")
+    command.send_at_command("AT#REBOOT")
