@@ -62,6 +62,12 @@ class TestFunctional (unittest.TestCase):
         
         self.assertEqual(self.log_file.readline(), '225109.000,1545.1554S,04752.9177W,3,190.05,11.03\n')
         
+    def test_should_get_new_log_filename(self):
+        when(GPS).getActualPosition().thenReturn('225109.000,1545.1554S,04752.9177W,0.6,1066.3,3,190.05,11.03,0.01,261010,10')
+        
+        filename = main.get_new_log_filename()
+        self.assertEqual(filename, 'laptimer225109.log')
+        
 if __name__ == '__main__':
     # unique = unittest.TestSuite()
     #     unique.addTest(TestFunctional('test_should_send_a_start_message'))

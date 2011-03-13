@@ -77,15 +77,40 @@ def init():
         
     except Exception, err:
         SER.send("Erro ao iniciar o modulo: %s\n"%err)
+        
+def get_new_log_filename():
+    # Get the gps string
+    gps_string = GPS.getActualPosition()
+
+    gps_split_message = gps_string.split(',')
+
+    if is_valid_message(gps_split_message):
+        return "laptimer%s.log"%gps_split_message[0].split('.')[0]
+
+    return ''        
     
 if __name__ == "__main__":
     SER.set_speed("115200")
-    SER.send("Iniciando cliente Lap Timer em %d"%MOD.secCounter())
+    SER.send("Iniciando cliente Lap Timer em %d\n"%MOD.secCounter())
+    
+    # Watchdog set to 20 seconds
+    MOD.watchdogEnable(20) 
     
     # Open the log file
     gps_log_file = None
     
     init()
+        
+    log_filename = ''
+    
+    while(log_filename == ''):
+        log_filename = get_new_log_filename()
+        if log_filename == '':
+            SER.send("Nome de arquivo de log nao criado.\n")
+            MOD.sleep(10)
+        else:
+            SER.send("Nome do novo arquivo: %s"%log_filename)
+            MOD.watchdogReset()
         
     try:    
         gps_log_file = open(GPS_LOG_FILE_NAME, 'w')    
@@ -99,6 +124,7 @@ if __name__ == "__main__":
         
             while(1):
                 loop(gps_log_file)
+                MOD.watchdogReset()
                 
                 # Sleep to let the file flush work
                 MOD.sleep(2)
